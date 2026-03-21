@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dimensions -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">48dp</dimen>
+
+    <dimen name="padding_screen">20dp</dimen>
+    <dimen name="padding_card">16dp</dimen>
+    <dimen name="padding_button">16dp</dimen>
+
+    <dimen name="corner_small">12dp</dimen>
+    <dimen name="corner_medium">16dp</dimen>
+    <dimen name="corner_large">24dp</dimen>
+    <dimen name="corner_xl">32dp</dimen>
+
+    <dimen name="elevation_low">2dp</dimen>
+    <dimen name="elevation_medium">4dp</dimen>
+    <dimen name="elevation_high">8dp</dimen>
+
+    <dimen name="icon_small">24dp</dimen>
+    <dimen name="icon_medium">32dp</dimen>
+    <dimen name="icon_large">48dp</dimen>
+    <dimen name="icon_xl">64dp</dimen>
+
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="button_height_large">72dp</dimen>
+
+    <dimen name="bottom_nav_height">64dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+
+    <dimen name="progress_size">180dp</dimen>
+    <dimen name="progress_stroke">8dp</dimen>
+
+    <dimen name="scan_animation_size">280dp</dimen>
+
+    <dimen name="device_item_height">72dp</dimen>
+
+    <dimen name="text_headline">28sp</dimen>
+    <dimen name="text_title">22sp</dimen>
+    <dimen name="text_subtitle">18sp</dimen>
+    <dimen name="text_body">16sp</dimen>
+    <dimen name="text_caption">12sp</dimen>
+    <dimen name="text_small">10sp</dimen>
+</resources>

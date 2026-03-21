@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    tools:context=".ui.send.SendFragment">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/send_files"
+        app:titleTextColor="?colorOnSurface" />
+
+    <!-- Selected Files Section -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_selected_files"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_screen"
+        app:cardCornerRadius="@dimen/corner_large"
+        app:cardElevation="@dimen/elevation_low"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_md">
+
+            <TextView
+                android:id="@+id/text_files_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_files_selected"
+                android:textAppearance="@style/TextAppearance.SwiftShare.Body"
+                android:textColor="?colorOnSurface"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_total_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:textAppearance="@style/TextAppearance.SwiftShare.Caption"
+                android:visibility="gone"
+                tools:text="Total: 12.5 MB" />
+
+            <!-- Selected Files List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_selected_files"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Select Files Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_select_files"
+        style="@style/Widget.SwiftShare.Button.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_screen"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="@string/select_files"
+        app:icon="@drawable/ic_file"
+        app:iconGravity="start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_selected_files" />
+
+    <!-- Proceed Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_proceed"
+        style="@style/Widget.SwiftShare.Button.Primary"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginHorizontal="@dimen/padding_screen"
+        android:layout_marginBottom="@dimen/spacing_lg"
+        android:enabled="false"
+        android:text="@string/scanning_devices"
+        app:icon="@drawable/ic_bluetooth"
+        app:iconGravity="start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

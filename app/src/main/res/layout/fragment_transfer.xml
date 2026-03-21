@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    tools:context=".ui.transfer.TransferFragment">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/sending"
+        app:titleTextColor="?colorOnSurface" />
+
+    <!-- Circular Progress Container -->
+    <FrameLayout
+        android:id="@+id/progress_container"
+        android:layout_width="@dimen/progress_size"
+        android:layout_height="@dimen/progress_size"
+        app:layout_constraintBottom_toTopOf="@id/text_file_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <!-- Background Circle -->
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:progress="100"
+            app:indicatorColor="@color/surface_container"
+            app:indicatorSize="180dp"
+            app:trackThickness="8dp" />
+
+        <!-- Progress Indicator -->
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_transfer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:indicatorColor="?colorPrimary"
+            app:indicatorSize="180dp"
+            app:trackThickness="8dp"
+            app:trackColor="@android:color/transparent"
+            tools:progress="65" />
+
+        <!-- Progress Percentage -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_progress_percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?colorPrimary"
+                android:textSize="36sp"
+                android:textStyle="bold"
+                tools:text="65%" />
+
+            <TextView
+                android:id="@+id/text_transfer_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.SwiftShare.Caption"
+                android:textColor="?colorOnSurfaceVariant"
+                tools:text="2.5 MB/s" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- File Name -->
+    <TextView
+        android:id="@+id/text_file_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_xl"
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:ellipsize="middle"
+        android:gravity="center"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.SwiftShare.Body"
+        android:textColor="?colorOnSurface"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/text_transfer_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progress_container"
+        tools:text="document.pdf" />
+
+    <!-- Transfer Status -->
+    <TextView
+        android:id="@+id/text_transfer_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:textAppearance="@style/TextAppearance.SwiftShare.Caption"
+        android:textColor="?colorOnSurfaceVariant"
+        app:layout_constraintBottom_toTopOf="@id/card_transfer_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_file_name"
+        tools:text="Sending to Galaxy S24…" />
+
+    <!-- Transfer Info Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_transfer_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_screen"
+        android:layout_marginTop="@dimen/spacing_lg"
+        app:cardCornerRadius="@dimen/corner_large"
+        app:cardElevation="@dimen/elevation_low"
+        app:layout_constraintBottom_toTopOf="@id/btn_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_transfer_status">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/spacing_md">
+
+            <!-- File Size -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Size"
+                    android:textAppearance="@style/TextAppearance.SwiftShare.Caption" />
+
+                <TextView
+                    android:id="@+id/text_file_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold"
+                    tools:text="12.5 MB" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/divider" />
+
+            <!-- Speed -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Speed"
+                    android:textAppearance="@style/TextAppearance.SwiftShare.Caption" />
+
+                <TextView
+                    android:id="@+id/text_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold"
+                    tools:text="2.5 MB/s" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/divider" />
+
+            <!-- Time Remaining -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ETA"
+                    android:textAppearance="@style/TextAppearance.SwiftShare.Caption" />
+
+                <TextView
+                    android:id="@+id/text_eta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold"
+                    tools:text="0:45" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Cancel Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_cancel"
+        style="@style/Widget.SwiftShare.Button.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginHorizontal="@dimen/padding_screen"
+        android:layout_marginBottom="@dimen/spacing_lg"
+        android:text="@string/cancel_transfer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Success Overlay (hidden by default) -->
+    <LinearLayout
+        android:id="@+id/layout_success"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/ic_check_circle"
+            app:tint="@color/success"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:text="@string/transfer_complete"
+            android:textAppearance="@style/TextAppearance.SwiftShare.Title"
+            android:textColor="@color/success" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

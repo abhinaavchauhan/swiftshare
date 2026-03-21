@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Override base colors for dark mode using Android resource qualifiers -->
+
+    <!-- Primary stays vibrant but slightly lighter for dark backgrounds -->
+    <color name="primary">#FF768FFF</color>
+    <color name="primary_dark">#FF2962FF</color>
+    <color name="primary_variant">#FF2962FF</color>
+    <color name="on_primary">#FF000000</color>
+
+    <!-- Secondary -->
+    <color name="secondary">#FF00E5FF</color>
+    <color name="secondary_dark">#FF00B2CC</color>
+    <color name="secondary_variant">#FF00BCD4</color>
+    <color name="on_secondary">#FF000000</color>
+
+    <!-- Tertiary -->
+    <color name="tertiary">#FFB47CFF</color>
+    <color name="on_tertiary">#FF000000</color>
+
+    <!-- Surface Colors - Deep Indigo Dark -->
+    <color name="surface">#FF121228</color>
+    <color name="surface_variant">#FF1E1E3A</color>
+    <color name="surface_container">#FF252548</color>
+    <color name="surface_container_high">#FF2D2D56</color>
+    <color name="on_surface">#FFEAEAFF</color>
+    <color name="on_surface_variant">#FFCACADF</color>
+
+    <!-- Background -->
+    <color name="background">#FF0A0A1A</color>
+    <color name="on_background">#FFEAEAFF</color>
+
+    <!-- Error -->
+    <color name="error">#FFFF6B6B</color>
+    <color name="on_error">#FF000000</color>
+    <color name="error_container">#FF93000A</color>
+
+    <!-- Success -->
+    <color name="success">#FF69F0AE</color>
+    <color name="success_dark">#FF00E676</color>
+
+    <!-- Warning -->
+    <color name="warning">#FFFFD740</color>
+
+    <!-- Glassmorphism - Dark variant -->
+    <color name="glass_surface">#66121228</color>
+    <color name="glass_border">#33FFFFFF</color>
+    <color name="glass_shadow">#33000000</color>
+
+    <!-- Navigation -->
+    <color name="nav_indicator">#FF768FFF</color>
+    <color name="nav_ripple">#33768FFF</color>
+
+    <!-- Shimmer -->
+    <color name="shimmer_base">#FF1E1E3A</color>
+    <color name="shimmer_highlight">#FF252548</color>
+
+    <!-- Divider -->
+    <color name="divider">#1FFFFFFF</color>
+</resources>

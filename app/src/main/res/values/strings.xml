@@ -1,0 +1,131 @@
+<resources>
+    <string name="app_name">SwiftShare</string>
+    <string name="app_tagline">Lightning-Fast File Sharing</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home Screen -->
+    <string name="send_files">Send Files</string>
+    <string name="receive_files">Receive Files</string>
+    <string name="send_description">Select and send files to nearby devices</string>
+    <string name="receive_description">Make your device discoverable to receive files</string>
+    <string name="recent_transfers">Recent Transfers</string>
+    <string name="view_all">View All</string>
+
+    <!-- Device Discovery -->
+    <string name="scanning_devices">Scanning for nearby devices…</string>
+    <string name="no_devices_found">No devices found nearby</string>
+    <string name="tap_to_connect">Tap a device to connect</string>
+    <string name="device_paired">Paired</string>
+    <string name="device_available">Available</string>
+    <string name="stop_scanning">Stop Scanning</string>
+    <string name="start_scanning">Start Scanning</string>
+    <string name="retry_scan">Retry Scan</string>
+    <string name="discovering">Discovering devices…</string>
+
+    <!-- File Selection -->
+    <string name="select_files">Select Files</string>
+    <string name="no_files_selected">No files selected</string>
+    <string name="files_selected">%d file(s) selected</string>
+    <string name="total_size">Total: %s</string>
+
+    <!-- Transfer -->
+    <string name="sending">Sending…</string>
+    <string name="receiving">Receiving…</string>
+    <string name="transfer_complete">Transfer Complete!</string>
+    <string name="transfer_failed">Transfer Failed</string>
+    <string name="transfer_speed">%s/s</string>
+    <string name="time_remaining">%s remaining</string>
+    <string name="transfer_progress">%d%%</string>
+    <string name="cancel_transfer">Cancel</string>
+    <string name="retry_transfer">Retry</string>
+    <string name="connection_lost">Connection lost. Please try again.</string>
+    <string name="transfer_cancelled">Transfer cancelled</string>
+
+    <!-- History -->
+    <string name="transfer_history">Transfer History</string>
+    <string name="no_history">No transfer history yet</string>
+    <string name="no_history_description">Your file transfers will appear here</string>
+    <string name="clear_history">Clear History</string>
+    <string name="history_cleared">History cleared</string>
+    <string name="sent">Sent</string>
+    <string name="received">Received</string>
+    <string name="all">All</string>
+    <string name="filter">Filter</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="general">General</string>
+    <string name="appearance">Appearance</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="dark_mode_desc">Switch between light and dark theme</string>
+    <string name="device_name">Device Name</string>
+    <string name="device_name_desc">Name visible to other devices</string>
+    <string name="save_location">Save Location</string>
+    <string name="save_location_desc">Default folder for received files</string>
+    <string name="auto_accept">Auto-Accept Files</string>
+    <string name="auto_accept_desc">Automatically accept incoming transfers</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_desc">Show transfer notifications</string>
+    <string name="about">About</string>
+    <string name="version">Version %s</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="licenses">Open Source Licenses</string>
+
+    <!-- Permissions -->
+    <string name="permission_required">Permission Required</string>
+    <string name="bluetooth_permission_rationale">SwiftShare needs Bluetooth access to discover and connect with nearby devices for file sharing.</string>
+    <string name="storage_permission_rationale">SwiftShare needs storage access to read and save transferred files.</string>
+    <string name="location_permission_rationale">Location access is needed to scan for nearby Bluetooth devices.</string>
+    <string name="notification_permission_rationale">Allow notifications to track file transfer progress.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="open_settings">Open Settings</string>
+
+    <!-- Bluetooth -->
+    <string name="bluetooth_not_supported">Bluetooth is not supported on this device</string>
+    <string name="bluetooth_disabled">Please enable Bluetooth to use SwiftShare</string>
+    <string name="enable_bluetooth">Enable Bluetooth</string>
+    <string name="bluetooth_enabled">Bluetooth enabled</string>
+    <string name="waiting_for_connection">Waiting for connection…</string>
+    <string name="connected_to">Connected to %s</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="make_discoverable">Make Discoverable</string>
+    <string name="discoverable_for">Discoverable for %d seconds</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_transfer">File Transfers</string>
+    <string name="notification_channel_transfer_desc">Notifications for file transfer progress</string>
+    <string name="notification_sending">Sending %s</string>
+    <string name="notification_receiving">Receiving %s</string>
+    <string name="notification_complete">Transfer complete: %s</string>
+    <string name="notification_failed">Transfer failed: %s</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_file_too_large">File is too large to transfer</string>
+    <string name="error_no_bluetooth">Bluetooth adapter not found</string>
+    <string name="error_connection_failed">Failed to connect. Please try again.</string>
+    <string name="error_file_not_found">File not found</string>
+
+    <!-- Dialogs -->
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_clear_history">Are you sure you want to clear all transfer history?</string>
+    <string name="incoming_file_request">Incoming File Request</string>
+    <string name="accept_file_from">Accept file \"%s\" (%s) from %s?</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+
+    <!-- File Sizes -->
+    <string name="size_bytes">%d B</string>
+    <string name="size_kb">%.1f KB</string>
+    <string name="size_mb">%.1f MB</string>
+    <string name="size_gb">%.2f GB</string>
+</resources>

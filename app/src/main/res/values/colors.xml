@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Brand Colors - Deep Electric Blue -->
+    <color name="primary">#FF2962FF</color>
+    <color name="primary_dark">#FF0039CB</color>
+    <color name="primary_light">#FF768FFF</color>
+    <color name="primary_variant">#FF1A47CC</color>
+    <color name="on_primary">#FFFFFFFF</color>
+
+    <!-- Secondary Colors - Vibrant Cyan -->
+    <color name="secondary">#FF00E5FF</color>
+    <color name="secondary_dark">#FF00B2CC</color>
+    <color name="secondary_light">#FF6EFFFF</color>
+    <color name="secondary_variant">#FF00BCD4</color>
+    <color name="on_secondary">#FF000000</color>
+
+    <!-- Tertiary Colors - Electric Purple -->
+    <color name="tertiary">#FF7C4DFF</color>
+    <color name="tertiary_light">#FFB47CFF</color>
+    <color name="on_tertiary">#FFFFFFFF</color>
+
+    <!-- Surface Colors -->
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_variant">#FFF5F5F5</color>
+    <color name="surface_container">#FFEEF2FF</color>
+    <color name="surface_container_high">#FFE3E8FF</color>
+    <color name="on_surface">#FF1A1A2E</color>
+    <color name="on_surface_variant">#FF49454F</color>
+
+    <!-- Background Colors -->
+    <color name="background">#FFFAFAFE</color>
+    <color name="on_background">#FF1A1A2E</color>
+
+    <!-- Error Colors -->
+    <color name="error">#FFFF1744</color>
+    <color name="on_error">#FFFFFFFF</color>
+    <color name="error_container">#FFFFDAD6</color>
+
+    <!-- Success Colors -->
+    <color name="success">#FF00E676</color>
+    <color name="success_dark">#FF00B248</color>
+    <color name="on_success">#FF000000</color>
+
+    <!-- Warning Colors -->
+    <color name="warning">#FFFFAB00</color>
+    <color name="on_warning">#FF000000</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#FF2962FF</color>
+    <color name="gradient_center">#FF7C4DFF</color>
+    <color name="gradient_end">#FF00E5FF</color>
+
+    <!-- Glassmorphism -->
+    <color name="glass_surface">#B3FFFFFF</color>
+    <color name="glass_border">#33FFFFFF</color>
+    <color name="glass_shadow">#1A000000</color>
+
+    <!-- Dark Mode Colors -->
+    <color name="dark_surface">#FF121228</color>
+    <color name="dark_surface_variant">#FF1E1E3A</color>
+    <color name="dark_surface_container">#FF252548</color>
+    <color name="dark_surface_container_high">#FF2D2D56</color>
+    <color name="dark_background">#FF0A0A1A</color>
+    <color name="dark_on_surface">#FFEAEAFF</color>
+    <color name="dark_on_surface_variant">#FFCACADF</color>
+    <color name="dark_glass_surface">#66121228</color>
+    <color name="dark_glass_border">#33FFFFFF</color>
+
+    <!-- Transfer Status Colors -->
+    <color name="status_sending">#FF2962FF</color>
+    <color name="status_receiving">#FF00E5FF</color>
+    <color name="status_completed">#FF00E676</color>
+    <color name="status_failed">#FFFF1744</color>
+    <color name="status_paused">#FFFFAB00</color>
+
+    <!-- Navigation -->
+    <color name="nav_indicator">#FF2962FF</color>
+    <color name="nav_ripple">#332962FF</color>
+
+    <!-- Shimmer -->
+    <color name="shimmer_base">#FFE0E0E0</color>
+    <color name="shimmer_highlight">#FFF5F5F5</color>
+
+    <!-- Divider -->
+    <color name="divider">#1F000000</color>
+    <color name="dark_divider">#1FFFFFFF</color>
+
+    <!-- Common -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="transparent">#00000000</color>
+</resources>

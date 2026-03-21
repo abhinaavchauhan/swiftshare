@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.swiftshare.app.ui.home.HomeFragment"
+        android:label="@string/nav_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_send"
+            app:destination="@id/navigation_send"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_home_to_receive"
+            app:destination="@id/navigation_receive"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_history"
+        android:name="com.swiftshare.app.ui.history.HistoryFragment"
+        android:label="@string/nav_history"
+        tools:layout="@layout/fragment_history" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.swiftshare.app.ui.settings.SettingsFragment"
+        android:label="@string/nav_settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/navigation_send"
+        android:name="com.swiftshare.app.ui.send.SendFragment"
+        android:label="@string/send_files"
+        tools:layout="@layout/fragment_send">
+        <action
+            android:id="@+id/action_send_to_device_discovery"
+            app:destination="@id/navigation_device_discovery"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_receive"
+        android:name="com.swiftshare.app.ui.receive.ReceiveFragment"
+        android:label="@string/receive_files"
+        tools:layout="@layout/fragment_receive" />
+
+    <fragment
+        android:id="@+id/navigation_device_discovery"
+        android:name="com.swiftshare.app.ui.discovery.DeviceDiscoveryFragment"
+        android:label="@string/scanning_devices"
+        tools:layout="@layout/fragment_device_discovery">
+        <action
+            android:id="@+id/action_discovery_to_transfer"
+            app:destination="@id/navigation_transfer"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_transfer"
+        android:name="com.swiftshare.app.ui.transfer.TransferFragment"
+        android:label="@string/sending"
+        tools:layout="@layout/fragment_transfer" />
+
+</navigation>
