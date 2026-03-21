@@ -137,5 +137,5 @@ This project is available for personal and portfolio use.
 ---
 
 <p align="center">
-  Built with ❤️ by SwiftShare Team
+  Built with ❤️ by SwiftShare
 </p>
