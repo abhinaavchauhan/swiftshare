@@ -1,10 +1,11 @@
 package com.swiftshare.app.ui.transfer;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
@@ -24,12 +25,13 @@ import com.swiftshare.app.service.FileTransferService;
 import com.swiftshare.app.ui.viewmodel.TransferViewModel;
 import com.swiftshare.app.utils.FileUtils;
 
+import java.io.File;
+import java.util.List;
+
 /**
- * Transfer progress fragment.
- * Shows circular progress, speed, ETA, and file information.
- * Binds to FileTransferService for real-time updates.
+ * Transfer progress fragment for Wi-Fi Direct file transfers.
  */
-public class TransferFragment extends Fragment {
+public class TransferFragment extends Fragment implements FileTransferService.ServiceCallback {
 
     private FragmentTransferBinding binding;
     private TransferViewModel viewModel;
@@ -39,84 +41,10 @@ public class TransferFragment extends Fragment {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            FileTransferService.TransferBinder binder =
-                    (FileTransferService.TransferBinder) service;
+            FileTransferService.TransferBinder binder = (FileTransferService.TransferBinder) service;
             transferService = binder.getService();
+            transferService.setServiceCallback(TransferFragment.this);
             isBound = true;
-
-            transferService.setServiceCallback(new FileTransferService.ServiceCallback() {
-                @Override
-                public void onConnectionStateChanged(int state) {}
-
-                @Override
-                public void onDeviceConnected(BluetoothDevice device) {
-                    if (viewModel != null) {
-                        String name1;
-                        try {
-                            name1 = device.getName() != null ? device.getName() : "Unknown Device";
-                        } catch (SecurityException e) {
-                            name1 = "Unknown Device";
-                        }
-                        viewModel.setStatus("Connected to " + name1);
-                    }
-                }
-
-                @Override
-                public void onConnectionFailed(String error) {
-                    if (viewModel != null) {
-                        viewModel.setStatus("Connection failed");
-                        viewModel.setFailed(true);
-                    }
-                }
-
-                @Override
-                public void onConnectionLost() {
-                    if (viewModel != null) {
-                        viewModel.setStatus("Connection lost");
-                        viewModel.setFailed(true);
-                    }
-                }
-
-                @Override
-                public void onTransferStarted(String fileName, long fileSize, boolean isSending) {
-                    if (viewModel != null) {
-                        viewModel.setFileName(fileName);
-                        viewModel.setFileSize(fileSize);
-                        viewModel.setStatus(isSending ? "Sending..." : "Receiving...");
-                    }
-                }
-
-                @Override
-                public void onTransferProgress(int progress, long speed, long eta,
-                                               long bytesTransferred, long totalBytes) {
-                    if (viewModel != null) {
-                        viewModel.updateProgress(progress, speed, eta, bytesTransferred);
-                    }
-                }
-
-                @Override
-                public void onTransferComplete(String fileName, long fileSize, boolean wasSending) {
-                    if (viewModel != null) {
-                        viewModel.setComplete(true);
-                        viewModel.setStatus("Transfer complete!");
-                    }
-                }
-
-                @Override
-                public void onTransferFailed(String error) {
-                    if (viewModel != null) {
-                        viewModel.setFailed(true);
-                        viewModel.setStatus("Transfer failed: " + error);
-                    }
-                }
-
-                @Override
-                public void onTransferCancelled() {
-                    if (viewModel != null) {
-                        viewModel.setStatus("Transfer cancelled");
-                    }
-                }
-            });
         }
 
         @Override
@@ -127,9 +55,7 @@ public class TransferFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentTransferBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -137,10 +63,8 @@ public class TransferFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         viewModel = new ViewModelProvider(this).get(TransferViewModel.class);
 
-        // Get arguments
         if (getArguments() != null) {
             String deviceName = getArguments().getString("device_name", "Device");
             viewModel.setStatus("Connecting to " + deviceName + "...");
@@ -153,70 +77,152 @@ public class TransferFragment extends Fragment {
 
     private void setupClickListeners() {
         binding.btnCancel.setOnClickListener(v -> {
-            if (transferService != null) {
-                transferService.cancelTransfer();
-            }
+            if (transferService != null) transferService.cancelTransfer();
             Navigation.findNavController(v).navigateUp();
         });
+
+        binding.btnDone.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
+        binding.btnViewFile.setOnClickListener(v -> openSavedFileLocation());
     }
 
-    /**
-     * Observes ViewModel LiveData and updates the UI.
-     */
+    private void openSavedFileLocation() {
+        try {
+            File downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_DOWNLOADS);
+            File swiftShareDir = new File(downloadsDir, "SwiftShare");
+            
+            Uri uri = Uri.parse(swiftShareDir.getAbsolutePath());
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "resource/folder");
+            
+            if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
+                startActivity(intent);
+            } else {
+                startActivity(new Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS));
+            }
+        } catch (Exception e) {
+            try {
+                startActivity(new Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS));
+            } catch (Exception ex) {
+                android.widget.Toast.makeText(requireContext(), "Could not open file manager", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void observeData() {
         viewModel.getProgress().observe(getViewLifecycleOwner(), progress -> {
             binding.progressTransfer.setProgress(progress);
             binding.textProgressPercent.setText(progress + "%");
         });
 
-        viewModel.getSpeed().observe(getViewLifecycleOwner(), speed -> {
-            String speedText = FileUtils.formatSpeed(speed);
-            binding.textTransferSpeed.setText(speedText);
-            binding.textSpeed.setText(speedText);
-        });
+        viewModel.getSpeed().observe(getViewLifecycleOwner(), speed -> 
+                binding.textTransferSpeed.setText(FileUtils.formatSpeed(speed)));
 
-        viewModel.getEta().observe(getViewLifecycleOwner(), eta ->
+        viewModel.getEta().observe(getViewLifecycleOwner(), eta -> 
                 binding.textEta.setText(FileUtils.formatETA(eta)));
 
-        viewModel.getFileName().observe(getViewLifecycleOwner(), name ->
+        viewModel.getFileName().observe(getViewLifecycleOwner(), name -> 
                 binding.textFileName.setText(name));
 
-        viewModel.getFileSize().observe(getViewLifecycleOwner(), size ->
+        viewModel.getFileSize().observe(getViewLifecycleOwner(), size -> 
                 binding.textFileSize.setText(FileUtils.formatFileSize(size)));
 
-        viewModel.getStatus().observe(getViewLifecycleOwner(), status ->
+        viewModel.getStatus().observe(getViewLifecycleOwner(), status -> 
                 binding.textTransferStatus.setText(status));
 
         viewModel.getIsComplete().observe(getViewLifecycleOwner(), complete -> {
-            if (complete != null && complete) {
-                showSuccess();
-            }
+            if (complete != null && complete) showSuccess();
         });
 
         viewModel.getIsFailed().observe(getViewLifecycleOwner(), failed -> {
-            if (failed != null && failed) {
-                binding.btnCancel.setText(R.string.retry_transfer);
-            }
+            if (failed != null && failed) binding.btnCancel.setText("Retry");
         });
     }
 
-    /**
-     * Displays the success overlay with animation.
-     */
     private void showSuccess() {
-        binding.progressContainer.setVisibility(View.GONE);
-        binding.cardTransferInfo.setVisibility(View.GONE);
-        binding.layoutSuccess.setVisibility(View.VISIBLE);
-        binding.layoutSuccess.startAnimation(
+        binding.cardActiveTransfer.setVisibility(View.GONE);
+        binding.btnCancel.setVisibility(View.GONE);
+        binding.layoutSuccessContainer.setVisibility(View.VISIBLE);
+        binding.layoutCompletionButtons.setVisibility(View.VISIBLE);
+        
+        binding.layoutSuccessContainer.startAnimation(
                 AnimationUtils.loadAnimation(requireContext(), R.anim.fade_scale_in));
-        binding.btnCancel.setText(R.string.ok);
-        binding.btnCancel.setOnClickListener(v ->
-                Navigation.findNavController(v).navigateUp());
+        binding.layoutCompletionButtons.startAnimation(
+                AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in));
     }
 
     private void bindService() {
         Intent intent = new Intent(requireContext(), FileTransferService.class);
         requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    // ── FileTransferService.ServiceCallback Implementation ──
+
+    @Override
+    public void onDiscoveryStarted() {}
+
+    @Override
+    public void onDiscoveryFailed(int reason) {}
+
+    @Override
+    public void onPeersDiscovered(List<WifiP2pDevice> peers) {}
+
+    @Override
+    public void onDeviceConnected(String deviceName) {
+        if (viewModel != null) viewModel.setStatus("Connected to " + deviceName);
+    }
+
+    @Override
+    public void onConnectionFailed(String error) {
+        if (viewModel != null) {
+            viewModel.setStatus("Connection failed: " + error);
+            viewModel.setFailed(true);
+        }
+    }
+
+    @Override
+    public void onConnectionLost() {
+        if (viewModel != null) {
+            viewModel.setStatus("Connection lost");
+            viewModel.setFailed(true);
+        }
+    }
+
+    @Override
+    public void onTransferStarted(String fileName, long fileSize, boolean isSending) {
+        if (viewModel != null) {
+            viewModel.setFileName(fileName);
+            viewModel.setFileSize(fileSize);
+            viewModel.setStatus(isSending ? "Sending..." : "Receiving...");
+        }
+    }
+
+    @Override
+    public void onTransferProgress(int progress, long speed, long eta, long bytesTransferred, long totalBytes) {
+        if (viewModel != null) {
+            viewModel.updateProgress(progress, speed, eta, bytesTransferred);
+        }
+    }
+
+    @Override
+    public void onTransferComplete(String fileName, long fileSize, boolean wasSending) {
+        if (viewModel != null) {
+            viewModel.setComplete(true);
+            viewModel.setStatus("Transfer complete!");
+        }
+    }
+
+    @Override
+    public void onTransferFailed(String error) {
+        if (viewModel != null) {
+            viewModel.setFailed(true);
+            viewModel.setStatus("Transfer failed: " + error);
+        }
+    }
+
+    @Override
+    public void onTransferCancelled() {
+        if (viewModel != null) viewModel.setStatus("Transfer cancelled");
     }
 
     @Override

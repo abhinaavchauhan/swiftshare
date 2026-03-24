@@ -1,101 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:colorBackground"
-    tools:context=".ui.send.SendFragment">
+    android:background="?android:colorBackground">
 
-    <!-- Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:elevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_back"
-        app:title="@string/send_files"
-        app:titleTextColor="?colorOnSurface" />
-
-    <!-- Selected Files Section -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_selected_files"
-        android:layout_width="0dp"
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding_screen"
-        app:cardCornerRadius="@dimen/corner_large"
-        app:cardElevation="@dimen/elevation_low"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        android:elevation="0dp"
+        android:background="?android:colorBackground">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="Send"
+            app:menu="@menu/menu_send" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabIndicatorFullWidth="false"
+            app:tabMode="fixed"
+            app:tabRippleColor="@null"
+            app:tabSelectedTextColor="?colorPrimary"
+            app:tabIndicatorColor="?colorPrimary"
+            app:tabTextColor="?colorOnSurfaceVariant"
+            style="@style/Widget.Material3.TabLayout.OnSurface" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <!-- Bottom Selection Bar -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_selection_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:strokeWidth="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/spacing_md">
+            android:layout_height="72dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:background="?colorPrimaryContainer">
 
-            <TextView
-                android:id="@+id/text_files_count"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_selected_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3 files selected"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?colorOnPrimaryContainer"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/text_total_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="14.5 MB"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?colorOnPrimaryContainer" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_send"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/no_files_selected"
-                android:textAppearance="@style/TextAppearance.SwiftShare.Body"
-                android:textColor="?colorOnSurface"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/text_total_size"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_xs"
-                android:textAppearance="@style/TextAppearance.SwiftShare.Caption"
-                android:visibility="gone"
-                tools:text="Total: 12.5 MB" />
-
-            <!-- Selected Files List -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_selected_files"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_sm"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false" />
+                android:text="Send"
+                app:cornerRadius="12dp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Select Files Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_select_files"
-        style="@style/Widget.SwiftShare.Button.Secondary"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_screen"
-        android:layout_marginTop="@dimen/spacing_md"
-        android:text="@string/select_files"
-        app:icon="@drawable/ic_file"
-        app:iconGravity="start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card_selected_files" />
-
-    <!-- Proceed Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_proceed"
-        style="@style/Widget.SwiftShare.Button.Primary"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/button_height"
-        android:layout_marginHorizontal="@dimen/padding_screen"
-        android:layout_marginBottom="@dimen/spacing_lg"
-        android:enabled="false"
-        android:text="@string/scanning_devices"
-        app:icon="@drawable/ic_bluetooth"
-        app:iconGravity="start"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

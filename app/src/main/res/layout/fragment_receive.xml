@@ -7,6 +7,13 @@
     android:background="?android:colorBackground"
     tools:context=".ui.receive.ReceiveFragment">
 
+    <!-- Background Gradient Decoration -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@drawable/bg_top_gradient"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -20,80 +27,107 @@
         app:title="@string/receive_files"
         app:titleTextColor="?colorOnSurface" />
 
-    <!-- Scanning Animation Container -->
-    <FrameLayout
-        android:id="@+id/scan_container"
-        android:layout_width="@dimen/scan_animation_size"
-        android:layout_height="@dimen/scan_animation_size"
-        app:layout_constraintBottom_toTopOf="@id/text_status"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintVertical_chainStyle="packed">
-
-        <!-- Pulse Ring 1 -->
-        <View
-            android:id="@+id/pulse_ring_1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.15"
-            android:background="@drawable/bg_scan_pulse" />
-
-        <!-- Pulse Ring 2 -->
-        <View
-            android:id="@+id/pulse_ring_2"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center"
-            android:alpha="0.25"
-            android:background="@drawable/bg_scan_pulse" />
-
-        <!-- Center Icon -->
-        <FrameLayout
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:background="@drawable/bg_circle_gradient"
-            android:elevation="4dp">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_bluetooth"
-                app:tint="@color/white"
-                android:contentDescription="@string/receive_files" />
-        </FrameLayout>
-    </FrameLayout>
-
-    <!-- Status Text -->
-    <TextView
-        android:id="@+id/text_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_xl"
-        android:text="@string/waiting_for_connection"
-        android:textAppearance="@style/TextAppearance.SwiftShare.Title"
-        android:textSize="@dimen/text_subtitle"
-        app:layout_constraintBottom_toTopOf="@id/text_description"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scan_container" />
-
-    <!-- Description Text -->
-    <TextView
-        android:id="@+id/text_description"
+    <!-- Main Container -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_main"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/spacing_xxl"
-        android:layout_marginTop="@dimen/spacing_sm"
-        android:gravity="center"
-        android:text="@string/receive_description"
-        android:textAppearance="@style/TextAppearance.SwiftShare.Caption"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/padding_screen"
+        app:cardCornerRadius="@dimen/corner_xlarge"
+        app:cardElevation="@dimen/elevation_low"
         app:layout_constraintBottom_toTopOf="@id/btn_discoverable"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_status" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_bias="0.5">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding_screen">
+
+            <!-- Scanning Animation Container -->
+            <FrameLayout
+                android:id="@+id/scan_container"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                app:layout_constraintBottom_toTopOf="@id/text_status"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed">
+
+                <!-- Pulse Rings -->
+                <View
+                    android:id="@+id/pulse_ring_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0.2"
+                    android:background="@drawable/bg_scan_pulse" />
+
+                <View
+                    android:id="@+id/pulse_ring_2"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:alpha="0.3"
+                    android:background="@drawable/bg_scan_pulse" />
+
+                <View
+                    android:id="@+id/pulse_ring_3"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center"
+                    android:alpha="0.4"
+                    android:background="@drawable/bg_scan_pulse" />
+
+                <!-- Center Icon -->
+                <FrameLayout
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_circle_gradient"
+                    android:elevation="8dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_bluetooth_searching"
+                        app:tint="@color/white" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- Status Text -->
+            <TextView
+                android:id="@+id/text_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xl"
+                android:text="@string/waiting_for_connection"
+                android:textAppearance="@style/TextAppearance.SwiftShare.Title"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@id/text_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/scan_container" />
+
+            <!-- Description Text -->
+            <TextView
+                android:id="@+id/text_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:gravity="center"
+                android:text="@string/receive_description"
+                android:textAppearance="@style/TextAppearance.SwiftShare.Body"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_status" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Make Discoverable Button -->
     <com.google.android.material.button.MaterialButton
@@ -108,7 +142,6 @@
         app:iconGravity="start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_description" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

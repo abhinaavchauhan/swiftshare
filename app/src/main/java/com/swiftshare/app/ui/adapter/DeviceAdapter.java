@@ -1,7 +1,6 @@
 package com.swiftshare.app.ui.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 
@@ -15,8 +14,7 @@ import com.swiftshare.app.data.model.DeviceItem;
 import com.swiftshare.app.databinding.ItemDeviceBinding;
 
 /**
- * RecyclerView adapter for discovered Bluetooth devices.
- * Shows device name, pairing status, and signal strength.
+ * RecyclerView adapter for discovered Wi-Fi Direct devices.
  */
 public class DeviceAdapter extends ListAdapter<DeviceItem, DeviceAdapter.ViewHolder> {
 
@@ -38,7 +36,7 @@ public class DeviceAdapter extends ListAdapter<DeviceItem, DeviceAdapter.ViewHol
                 public boolean areContentsTheSame(@NonNull DeviceItem oldItem,
                                                   @NonNull DeviceItem newItem) {
                     return oldItem.getName().equals(newItem.getName()) &&
-                            oldItem.isPaired() == newItem.isPaired();
+                            oldItem.getStatus() == newItem.getStatus();
                 }
             };
 
@@ -64,8 +62,6 @@ public class DeviceAdapter extends ListAdapter<DeviceItem, DeviceAdapter.ViewHol
         this.clickListener = listener;
     }
 
-    // ── ViewHolder ───────────────────────────────────
-
     class ViewHolder extends RecyclerView.ViewHolder {
         private final ItemDeviceBinding binding;
 
@@ -82,39 +78,37 @@ public class DeviceAdapter extends ListAdapter<DeviceItem, DeviceAdapter.ViewHol
         }
 
         void bind(DeviceItem item) {
-            binding.textDeviceName.setText(item.getName());
-
-            // Status text
+            String name = item.getName();
+            binding.textDeviceName.setText(name);
+            binding.textDeviceStatus.setText(item.getStatusLabel());
+            
+            // Set initial
+            if (name != null && !name.isEmpty()) {
+                binding.textAvatarInitial.setText(name.substring(0, 1).toUpperCase());
+            }
+            
+            // Set indicator color based on status
+            int statusColor;
+            switch (item.getStatusLabel()) {
+                case "Connected":
+                    statusColor = R.color.success;
+                    break;
+                case "Invited":
+                    statusColor = R.color.warning;
+                    break;
+                default:
+                    statusColor = R.color.on_surface_variant;
+                    break;
+            }
+            binding.textDeviceStatus.setTextColor(itemView.getContext().getColor(statusColor));
+            
+            // Highlight if connecting
             if (item.isConnecting()) {
                 binding.textDeviceStatus.setText("Connecting...");
-                binding.textDeviceStatus.setTextColor(
-                        itemView.getContext().getColor(R.color.warning));
-            } else if (item.isPaired()) {
-                binding.textDeviceStatus.setText("Paired");
-                binding.textDeviceStatus.setTextColor(
-                        itemView.getContext().getColor(R.color.success));
-            } else {
-                binding.textDeviceStatus.setText("Available");
-                binding.textDeviceStatus.setTextColor(
-                        itemView.getContext().getColor(R.color.on_surface_variant));
+                binding.textDeviceStatus.setTextColor(itemView.getContext().getColor(R.color.warning));
             }
-
-            // Signal strength
-            binding.textSignal.setText(item.getSignalLabel());
-
-            int signalColor;
-            if (item.getSignalStrength() >= -70) {
-                signalColor = R.color.success;
-            } else if (item.getSignalStrength() >= -85) {
-                signalColor = R.color.warning;
-            } else {
-                signalColor = R.color.error;
-            }
-            binding.textSignal.setTextColor(itemView.getContext().getColor(signalColor));
         }
     }
-
-    // ── Click Listener ───────────────────────────────
 
     public interface OnDeviceClickListener {
         void onDeviceClick(DeviceItem device);

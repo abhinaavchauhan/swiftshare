@@ -16,6 +16,7 @@
     <dimen name="corner_medium">16dp</dimen>
     <dimen name="corner_large">24dp</dimen>
     <dimen name="corner_xl">32dp</dimen>
+    <dimen name="corner_xlarge">48dp</dimen>
 
     <dimen name="elevation_low">2dp</dimen>
     <dimen name="elevation_medium">4dp</dimen>

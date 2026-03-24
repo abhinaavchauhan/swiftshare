@@ -8,6 +8,9 @@ import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -16,6 +19,10 @@ import java.util.Locale;
  * Utility class for file operations: size formatting, name resolution, MIME type detection.
  */
 public final class FileUtils {
+
+    public interface SaveCallback {
+        OutputStream getOutputStream(String fileName, long fileSize) throws IOException;
+    }
 
     private FileUtils() {} // Prevent instantiation
 
@@ -161,5 +168,50 @@ public final class FileUtils {
         // Default
         SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
         return sdf.format(new Date(timestamp));
+    }
+
+    /**
+     * Prepares a file in the public Downloads directory and returns an OutputStream.
+     */
+    public static OutputStream saveReceivedFile(Context context, String fileName, long fileSize) throws IOException {
+        File downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(
+                android.os.Environment.DIRECTORY_DOWNLOADS);
+        File swiftShareDir = new File(downloadsDir, "SwiftShare");
+        if (!swiftShareDir.exists() && !swiftShareDir.mkdirs()) {
+            throw new IOException("Could not create SwiftShare directory");
+        }
+
+        File saveFile = new File(swiftShareDir, fileName);
+        
+        // Handle duplicates
+        if (saveFile.exists()) {
+            String baseName = fileName;
+            String extension = "";
+            int lastDotIndex = fileName.lastIndexOf(".");
+            if (lastDotIndex != -1) {
+                baseName = fileName.substring(0, lastDotIndex);
+                extension = fileName.substring(lastDotIndex);
+            }
+            int counter = 1;
+            while (saveFile.exists()) {
+                saveFile = new File(swiftShareDir, baseName + "_" + counter + extension);
+                counter++;
+            }
+        }
+
+        // Notify MediaScanner after closing the stream (handled by caller usually, but we store the path)
+        final String finalPath = saveFile.getAbsolutePath();
+        
+        return new FileOutputStream(saveFile) {
+            @Override
+            public void close() throws IOException {
+                super.close();
+                // Trigger Media scan
+                android.media.MediaScannerConnection.scanFile(context,
+                        new String[]{finalPath},
+                        null,
+                        null);
+            }
+        };
     }
 }

@@ -21,8 +21,9 @@ public final class PermissionUtils {
     public static final int REQUEST_BLUETOOTH = 1001;
     public static final int REQUEST_STORAGE = 1002;
     public static final int REQUEST_LOCATION = 1003;
-    public static final int REQUEST_NOTIFICATION = 1004;
-    public static final int REQUEST_ALL = 1005;
+    public static final int REQUEST_NEARBY = 1004;
+    public static final int REQUEST_NOTIFICATION = 1005;
+    public static final int REQUEST_ALL = 1006;
 
     private PermissionUtils() {}
 
@@ -76,13 +77,11 @@ public final class PermissionUtils {
         for (String p : getBluetoothPermissions()) permissions.add(p);
         for (String p : getStoragePermissions()) permissions.add(p);
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-            permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.NEARBY_WIFI_DEVICES);
             permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+        } else {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
 
         return permissions.toArray(new String[0]);
@@ -127,12 +126,43 @@ public final class PermissionUtils {
     }
 
     /**
+     * Checks if location permissions are granted.
+     */
+    public static boolean hasLocationPermissions(Context context) {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Requests location permissions.
+     */
+    public static void requestLocationPermissions(Activity activity) {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                REQUEST_LOCATION);
+    }
+
+    /**
+     * Checks if nearby wifi permissions are granted (API 33+).
+     */
+    public static boolean hasNearbyPermission(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.NEARBY_WIFI_DEVICES)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+    /**
      * Checks if all required permissions are granted.
      */
     public static boolean hasAllPermissions(Context context) {
         return hasBluetoothPermissions(context) &&
                 hasStoragePermissions(context) &&
-                hasNotificationPermission(context);
+                hasNotificationPermission(context) &&
+                hasLocationPermissions(context) &&
+                hasNearbyPermission(context);
     }
 
     /**

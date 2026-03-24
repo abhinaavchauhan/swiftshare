@@ -4,9 +4,12 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -15,40 +18,61 @@ import androidx.core.app.NotificationCompat;
 
 import com.swiftshare.app.R;
 import com.swiftshare.app.SwiftShareApp;
-import com.swiftshare.app.bluetooth.BluetoothConnectionManager;
-import com.swiftshare.app.bluetooth.FileTransferManager;
+import com.swiftshare.app.p2p.P2PFileTransferManager;
+import com.swiftshare.app.p2p.P2PSocketManager;
+import com.swiftshare.app.p2p.WiFiDirectBroadcastReceiver;
+import com.swiftshare.app.p2p.WiFiDirectManager;
 import com.swiftshare.app.data.model.TransferEntity;
 import com.swiftshare.app.data.repository.TransferRepository;
 import com.swiftshare.app.ui.MainActivity;
 import com.swiftshare.app.utils.FileUtils;
 
+import java.net.Socket;
+import java.util.List;
+
 /**
- * Foreground service managing Bluetooth file transfers.
- * Runs in the background with a persistent notification showing transfer progress.
+ * Foreground service managing Wi-Fi Direct file transfers.
+ * Orchestrates device discovery, connection, and high-speed data transfer.
  */
 public class FileTransferService extends Service implements
-        BluetoothConnectionManager.ConnectionCallback,
-        FileTransferManager.TransferCallback {
+        WiFiDirectManager.P2PCallback,
+        P2PSocketManager.SocketCallback,
+        P2PFileTransferManager.TransferCallback {
 
     private static final String TAG = "FileTransferService";
     private static final int NOTIFICATION_ID = 1001;
 
     private final IBinder binder = new TransferBinder();
-    private BluetoothConnectionManager connectionManager;
-    private FileTransferManager transferManager;
+    private WiFiDirectManager p2pManager;
+    private P2PSocketManager socketManager;
+    private P2PFileTransferManager transferManager;
+    private WiFiDirectBroadcastReceiver receiver;
     private TransferRepository repository;
     private NotificationManager notificationManager;
 
+    private Socket activeSocket;
     private long currentTransferId = -1;
     private ServiceCallback serviceCallback;
+    private Uri pendingFileUri;
+    private boolean isReceiver = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        connectionManager = new BluetoothConnectionManager(this, this);
-        transferManager = new FileTransferManager(this, connectionManager, this);
+        p2pManager = new WiFiDirectManager(this, this);
+        socketManager = new P2PSocketManager(this);
+        transferManager = new P2PFileTransferManager();
         repository = new TransferRepository(getApplication());
-        notificationManager = getSystemService(NotificationManager.class);
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        // Register Wi-Fi Direct BroadcastReceiver
+        receiver = new WiFiDirectBroadcastReceiver(p2pManager);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        registerReceiver(receiver, filter);
     }
 
     @Override
@@ -65,49 +89,44 @@ public class FileTransferService extends Service implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        connectionManager.stop();
+        try {
+            unregisterReceiver(receiver);
+        } catch (Exception e) {
+            Log.e(TAG, "Receiver already unregistered", e);
+        }
+        socketManager.stop();
+        p2pManager.disconnect();
     }
 
     // ── Public API ───────────────────────────────────
 
-    /**
-     * Starts listening for incoming Bluetooth connections (receiver mode).
-     */
-    public void startListening() {
-        connectionManager.startListening();
-        updateNotification("Waiting for connection", "Discoverable and ready to receive");
+    public void startDiscovery() {
+        p2pManager.startDiscovery();
     }
 
-    /**
-     * Connects to a remote Bluetooth device and sends a file.
-     */
-    public void connectAndSend(BluetoothDevice device, Uri fileUri) {
-        connectionManager.connect(device);
-        // File send will be triggered after connection is established
-        // Store the URI to send after connection
-        pendingFileUri = fileUri;
+    public void stopDiscovery() {
+        p2pManager.stopDiscovery();
     }
 
-    private Uri pendingFileUri;
-
-    /**
-     * Sends a file over the established connection.
-     */
-    public void sendFile(Uri fileUri) {
-        if (connectionManager.getState() == BluetoothConnectionManager.STATE_CONNECTED) {
-            createTransferRecord(fileUri, true);
-            transferManager.sendFile(fileUri);
-        }
+    public void connect(WifiP2pDevice device, Uri fileUri) {
+        this.pendingFileUri = fileUri;
+        this.isReceiver = false;
+        p2pManager.connect(device);
     }
 
-    /**
-     * Cancels the current transfer.
-     */
+    public void startReceiverMode() {
+        this.isReceiver = true;
+        p2pManager.startDiscovery(); // Need discovery to be visible
+        updateNotification("Waiting for Sender", "Discoverable via Wi-Fi Direct");
+    }
+
     public void cancelTransfer() {
-        transferManager.cancelTransfer();
-        connectionManager.stop();
+        socketManager.stop();
         if (currentTransferId > 0) {
             repository.updateStatus(currentTransferId, "CANCELLED");
+        }
+        if (serviceCallback != null) {
+            serviceCallback.onTransferCancelled();
         }
     }
 
@@ -115,54 +134,82 @@ public class FileTransferService extends Service implements
         this.serviceCallback = callback;
     }
 
-    public BluetoothConnectionManager getConnectionManager() {
-        return connectionManager;
+    public WiFiDirectManager getP2pManager() {
+        return p2pManager;
     }
 
-    // ── BluetoothConnectionManager Callbacks ─────────
+    // ── WiFiDirectManager.P2PCallback ────────────────
 
     @Override
-    public void onStateChanged(int state) {
+    public void onDiscoveryStarted() {
+        Log.d(TAG, "Discovery started");
         if (serviceCallback != null) {
-            serviceCallback.onConnectionStateChanged(state);
+            serviceCallback.onDiscoveryStarted();
         }
     }
 
     @Override
-    public void onConnected(BluetoothDevice device) {
-        String deviceName;
-        try {
-            deviceName = device.getName() != null ? device.getName() : "Unknown Device";
-        } catch (SecurityException e) {
-            deviceName = "Unknown Device";
-        }
-        updateNotification("Connected", "Connected to " + deviceName);
-
+    public void onDiscoveryFailed(int reason) {
+        Log.e(TAG, "Discovery failed: " + reason);
         if (serviceCallback != null) {
-            serviceCallback.onDeviceConnected(device);
-        }
-
-        // If we have a pending file to send, send it now
-        if (pendingFileUri != null) {
-            sendFile(pendingFileUri);
-            pendingFileUri = null;
+            serviceCallback.onDiscoveryFailed(reason);
         }
     }
 
     @Override
-    public void onConnectionFailed(String error) {
-        updateNotification("Connection Failed", error);
+    public void onDiscoveryStopped() {
+        Log.d(TAG, "Discovery stopped");
+    }
+
+    @Override
+    public void onPeersAvailable(List<WifiP2pDevice> peers) {
         if (serviceCallback != null) {
-            serviceCallback.onConnectionFailed(error);
+            serviceCallback.onPeersDiscovered(peers);
         }
     }
 
     @Override
-    public void onConnectionLost() {
-        updateNotification("Connection Lost", "The connection was interrupted");
-        if (currentTransferId > 0 && transferManager.isTransferring()) {
-            repository.updateStatus(currentTransferId, "FAILED");
+    public void onConnectionInfoAvailable(WifiP2pInfo info) {
+        Log.d(TAG, "Connection info available. Group Owner: " + info.isGroupOwner);
+        
+        if (info.groupFormed) {
+            if (info.isGroupOwner) {
+                // I am the receiver (usually)
+                socketManager.startServer();
+            } else {
+                // I am the sender
+                socketManager.startClient(info.groupOwnerAddress.getHostAddress());
+            }
         }
+    }
+
+    @Override
+    public void onConnectionFailed(int reason) {
+        updateNotification("Connection Failed", "Reason: " + reason);
+        if (serviceCallback != null) {
+            serviceCallback.onConnectionFailed("P2P Error " + reason);
+        }
+    }
+
+    @Override
+    public void onP2PStateChanged(boolean enabled) {
+        Log.d(TAG, "Wi-Fi P2P Enabled: " + enabled);
+    }
+
+    // ── P2PSocketManager.SocketCallback ──────────────
+
+    @Override
+    public void onSocketConnected(Socket socket) {
+        Log.d(TAG, "Socket connected!");
+        handleConnection(socket);
+        if (serviceCallback != null) {
+            serviceCallback.onDeviceConnected("Nearby Device");
+        }
+    }
+
+    @Override
+    public void onSocketDisconnected() {
+        updateNotification("Disconnected", "Connection lost");
         if (serviceCallback != null) {
             serviceCallback.onConnectionLost();
         }
@@ -170,78 +217,68 @@ public class FileTransferService extends Service implements
 
     @Override
     public void onDataReceived(byte[] data) {
-        transferManager.onDataReceived(data);
+        // Not used directly here; P2PFileTransferManager handles the streams
     }
 
     @Override
-    public void onDataSent(int byteCount) {
-        // Handled by FileTransferManager
-    }
-
-    // ── FileTransferManager Callbacks ────────────────
-
-    @Override
-    public void onTransferStarted(String fileName, long fileSize, boolean isSending) {
-        String action = isSending ? "Sending" : "Receiving";
-        updateNotification(action + ": " + fileName, FileUtils.formatFileSize(fileSize));
-
-        if (!isSending) {
-            createReceiveRecord(fileName, fileSize);
-        }
-
+    public void onSocketError(String error) {
+        updateNotification("Socket Error", error);
         if (serviceCallback != null) {
-            serviceCallback.onTransferStarted(fileName, fileSize, isSending);
+            serviceCallback.onConnectionFailed(error);
         }
     }
 
-    @Override
-    public void onProgressUpdated(int progress, long speed, long eta,
-                                  long bytesTransferred, long totalBytes) {
-        updateProgressNotification(progress);
+    // ── Bridge connecting Socket -> FileTransfer ─────
 
+    /**
+     * Called by P2PSocketManager internal threads when a raw socket is ready.
+     * We override this to trigger our file transfer logic.
+     */
+    public void handleConnection(Socket socket) {
+        this.activeSocket = socket;
+        if (pendingFileUri != null) {
+            // I am the Sender
+            createTransferRecord(pendingFileUri, true);
+            transferManager.sendFile(this, socket, pendingFileUri, this);
+        } else {
+            // I am the Receiver
+            transferManager.receiveFile(this, socket, (fileName, size) -> FileUtils.saveReceivedFile(this, fileName, size), this);
+        }
+    }
+
+    // ── P2PFileTransferManager.TransferCallback ──────
+
+    @Override
+    public void onProgress(int progress, long speed, long eta, long transferred, long total) {
+        updateProgressNotification(progress);
         if (currentTransferId > 0) {
             repository.updateProgress(currentTransferId, "IN_PROGRESS", progress);
             repository.updateSpeed(currentTransferId, speed);
         }
-
         if (serviceCallback != null) {
-            serviceCallback.onTransferProgress(progress, speed, eta, bytesTransferred, totalBytes);
+            serviceCallback.onTransferProgress(progress, speed, eta, transferred, total);
         }
     }
 
     @Override
-    public void onTransferComplete(String fileName, long fileSize, boolean wasSending) {
-        String action = wasSending ? "Sent" : "Received";
-        updateNotification("Transfer Complete", action + ": " + fileName);
-
+    public void onComplete(String fileName) {
+        updateNotification("Transfer complete", fileName);
         if (currentTransferId > 0) {
             repository.updateStatus(currentTransferId, "COMPLETED");
         }
-
         if (serviceCallback != null) {
-            serviceCallback.onTransferComplete(fileName, fileSize, wasSending);
+            serviceCallback.onTransferComplete(fileName, 0, !isReceiver);
         }
     }
 
     @Override
-    public void onTransferFailed(String error) {
+    public void onError(String error) {
         updateNotification("Transfer Failed", error);
-
         if (currentTransferId > 0) {
             repository.updateStatus(currentTransferId, "FAILED");
         }
-
         if (serviceCallback != null) {
             serviceCallback.onTransferFailed(error);
-        }
-    }
-
-    @Override
-    public void onTransferCancelled() {
-        updateNotification("Transfer Cancelled", "The transfer was cancelled");
-
-        if (serviceCallback != null) {
-            serviceCallback.onTransferCancelled();
         }
     }
 
@@ -256,7 +293,7 @@ public class FileTransferService extends Service implements
         return new NotificationCompat.Builder(this, SwiftShareApp.CHANNEL_TRANSFER)
                 .setContentTitle(title)
                 .setContentText(text)
-                .setSmallIcon(R.drawable.ic_bluetooth)
+                .setSmallIcon(R.drawable.ic_launcher_foreground) // Use app icon
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .setSilent(true)
@@ -270,16 +307,10 @@ public class FileTransferService extends Service implements
     }
 
     private void updateProgressNotification(int progress) {
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
         Notification notification = new NotificationCompat.Builder(this, SwiftShareApp.CHANNEL_TRANSFER)
                 .setContentTitle("Transferring...")
                 .setContentText(progress + "% complete")
-                .setSmallIcon(R.drawable.ic_bluetooth)
-                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setOngoing(true)
                 .setSilent(true)
                 .setProgress(100, progress, false)
@@ -298,18 +329,7 @@ public class FileTransferService extends Service implements
         transfer.setFilePath(fileUri.toString());
         transfer.setFileSize(FileUtils.getFileSize(this, fileUri));
         transfer.setMimeType(FileUtils.getMimeType(this, fileUri));
-        transfer.setDirection(isSending ? "SENT" : "RECEIVED");
-        transfer.setStatus("IN_PROGRESS");
-        transfer.setStartTime(System.currentTimeMillis());
-
-        repository.insert(transfer, id -> currentTransferId = id);
-    }
-
-    private void createReceiveRecord(String fileName, long fileSize) {
-        TransferEntity transfer = new TransferEntity();
-        transfer.setFileName(fileName);
-        transfer.setFileSize(fileSize);
-        transfer.setDirection("RECEIVED");
+        transfer.setDirection("SENT");
         transfer.setStatus("IN_PROGRESS");
         transfer.setStartTime(System.currentTimeMillis());
 
@@ -327,8 +347,10 @@ public class FileTransferService extends Service implements
     // ── Service Callback Interface ───────────────────
 
     public interface ServiceCallback {
-        void onConnectionStateChanged(int state);
-        void onDeviceConnected(BluetoothDevice device);
+        void onDiscoveryStarted();
+        void onDiscoveryFailed(int reason);
+        void onPeersDiscovered(List<WifiP2pDevice> peers);
+        void onDeviceConnected(String deviceName);
         void onConnectionFailed(String error);
         void onConnectionLost();
         void onTransferStarted(String fileName, long fileSize, boolean isSending);

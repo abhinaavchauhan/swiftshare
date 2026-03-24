@@ -206,22 +206,49 @@ public class FileTransferManager {
      */
     private void saveReceivedFile() {
         try {
-            String savePath = context.getExternalFilesDir(null) +
-                    File.separator + "SwiftShare" + File.separator + receivingFileName;
+            // Use public Downloads directory for visibility in system apps
+            File downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_DOWNLOADS);
+            File swiftShareDir = new File(downloadsDir, "SwiftShare");
+            if (!swiftShareDir.exists()) {
+                swiftShareDir.mkdirs();
+            }
 
-            File saveFile = new File(savePath);
-            saveFile.getParentFile().mkdirs();
+            File saveFile = new File(swiftShareDir, receivingFileName);
+            
+            // Handle duplicate file names by appending index
+            if (saveFile.exists()) {
+                String baseName = receivingFileName;
+                String extension = "";
+                int lastDotIndex = receivingFileName.lastIndexOf(".");
+                if (lastDotIndex != -1) {
+                    baseName = receivingFileName.substring(0, lastDotIndex);
+                    extension = receivingFileName.substring(lastDotIndex);
+                }
+                
+                int counter = 1;
+                while (saveFile.exists()) {
+                    saveFile = new File(swiftShareDir, baseName + "_" + counter + extension);
+                    counter++;
+                }
+            }
 
             FileOutputStream fos = new FileOutputStream(saveFile);
             fos.write(receiveBuffer.toByteArray());
             fos.close();
+
+            // Notify MediaScanner to make the file visible in system apps (Gallery, Files, etc.)
+            android.media.MediaScannerConnection.scanFile(context,
+                    new String[]{saveFile.getAbsolutePath()},
+                    null,
+                    (path, uri) -> Log.d(TAG, "File scanned: " + path));
 
             isReceiving = false;
             headerReceived = false;
             receiveBuffer.reset();
 
             long fileSize = totalBytesToReceive;
-            String fileName = receivingFileName;
+            String fileName = saveFile.getName(); // Use actual saved name
 
             mainHandler.post(() -> callback.onTransferComplete(fileName, fileSize, false));
 

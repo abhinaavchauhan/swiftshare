@@ -104,8 +104,8 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PermissionUtils.REQUEST_ALL) {
-            if (!PermissionUtils.hasBluetoothPermissions(this)) {
-                Toast.makeText(this, R.string.bluetooth_permission_rationale, Toast.LENGTH_LONG).show();
+            if (!PermissionUtils.hasNearbyPermission(this) && !PermissionUtils.hasLocationPermissions(this)) {
+                Toast.makeText(this, "Location/Nearby permission is required for device discovery", Toast.LENGTH_LONG).show();
             }
             if (!PermissionUtils.hasStoragePermissions(this)) {
                 Toast.makeText(this, R.string.storage_permission_rationale, Toast.LENGTH_LONG).show();

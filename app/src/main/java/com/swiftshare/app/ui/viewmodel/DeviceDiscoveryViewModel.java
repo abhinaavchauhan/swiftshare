@@ -48,7 +48,7 @@ public class DeviceDiscoveryViewModel extends AndroidViewModel {
         // Avoid duplicates
         if (!current.contains(device)) {
             current.add(device);
-            discoveredDevices.setValue(current);
+            discoveredDevices.setValue(new ArrayList<>(current));
         }
     }
 

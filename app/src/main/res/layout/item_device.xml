@@ -1,70 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/spacing_sm"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="@dimen/corner_medium"
-    app:cardElevation="@dimen/elevation_low"
-    app:rippleColor="@color/nav_ripple">
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="8dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/device_item_height"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/spacing_md">
+    <!-- Avatar with Badge -->
+    <FrameLayout
+        android:layout_width="80dp"
+        android:layout_height="80dp">
 
-        <!-- Device Icon -->
-        <FrameLayout
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_chip">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:cardBackgroundColor="#E0E0E0"
+            app:cardCornerRadius="40dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <TextView
+                android:id="@+id/text_avatar_initial"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.Material3.HeadlineLarge"
+                android:textColor="@color/black"
+                tools:text="R" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Small Blue Key Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="4dp"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_device"
-                app:tint="?colorPrimary"
-                android:contentDescription="@null" />
-        </FrameLayout>
+                app:tint="@color/white" />
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
-        <!-- Device Info -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_md"
-            android:layout_weight="1"
-            android:orientation="vertical">
+    <TextView
+        android:id="@+id/text_device_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+        android:textColor="@color/black"
+        tools:text="REDMI NO..." />
 
-            <TextView
-                android:id="@+id/text_device_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?colorOnSurface"
-                android:textSize="@dimen/text_body"
-                android:textStyle="bold"
-                tools:text="Galaxy S24 Ultra" />
+    <TextView
+        android:id="@+id/text_device_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.6"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+        android:textColor="@color/black"
+        tools:text="Redmi ...e 5 Pro" />
 
-            <TextView
-                android:id="@+id/text_device_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.SwiftShare.Caption"
-                tools:text="Available" />
-        </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="..."
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+        android:textColor="@color/black" />
 
-        <!-- Signal Strength -->
-        <TextView
-            android:id="@+id/text_signal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.SwiftShare.Caption"
-            android:textColor="?colorPrimary"
-            tools:text="Strong" />
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>

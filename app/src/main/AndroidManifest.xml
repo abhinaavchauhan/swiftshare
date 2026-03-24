@@ -11,9 +11,17 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
 
-    <!-- Location (required for BT discovery on older devices) -->
+    <!-- Location (required for P2P discovery) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Wi-Fi Direct (P2P) Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="33" />
 
     <!-- Storage Permissions -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
@@ -33,8 +41,11 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Bluetooth feature declaration -->
-    <uses-feature android:name="android.hardware.bluetooth" android:required="true" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    
+    <!-- Wi-Fi Direct feature declaration -->
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="true" />
 
     <application
         android:name=".SwiftShareApp"
@@ -74,12 +85,6 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
-        <!-- Bluetooth Connection Service -->
-        <service
-            android:name=".service.BluetoothConnectionService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
 
         <!-- File Provider for sharing files -->
         <provider

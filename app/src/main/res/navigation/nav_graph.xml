@@ -56,7 +56,15 @@
         android:id="@+id/navigation_receive"
         android:name="com.swiftshare.app.ui.receive.ReceiveFragment"
         android:label="@string/receive_files"
-        tools:layout="@layout/fragment_receive" />
+        tools:layout="@layout/fragment_receive">
+        <action
+            android:id="@+id/action_receive_to_transfer"
+            app:destination="@id/navigation_transfer"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_device_discovery"

@@ -1,46 +1,31 @@
 package com.swiftshare.app.data.model;
 
-import android.bluetooth.BluetoothDevice;
+import android.net.wifi.p2p.WifiP2pDevice;
 
 /**
- * Model representing a discovered Bluetooth device.
- * Wraps BluetoothDevice with additional UI metadata.
+ * Model representing a discovered P2P device.
+ * Wraps WiFi Direct device with additional UI metadata.
  */
 public class DeviceItem {
 
-    private BluetoothDevice device;
+    private WifiP2pDevice device;
     private String name;
     private String address;
-    private boolean isPaired;
-    private int signalStrength; // RSSI value
     private boolean isConnecting;
+    private int status;
 
-    public DeviceItem(BluetoothDevice device, boolean isPaired) {
+    public DeviceItem(WifiP2pDevice device) {
         this.device = device;
-        this.address = device.getAddress();
-        this.isPaired = isPaired;
+        this.name = (device.deviceName == null || device.deviceName.isEmpty()) 
+                    ? "Unknown Device" : device.deviceName;
+        this.address = device.deviceAddress;
+        this.status = device.status;
         this.isConnecting = false;
-
-        // Get device name with permission handling
-        try {
-            this.name = device.getName();
-        } catch (SecurityException e) {
-            this.name = null;
-        }
-
-        if (this.name == null || this.name.isEmpty()) {
-            this.name = "Unknown Device";
-        }
-    }
-
-    public DeviceItem(BluetoothDevice device, boolean isPaired, int rssi) {
-        this(device, isPaired);
-        this.signalStrength = rssi;
     }
 
     // Getters and Setters
-    public BluetoothDevice getDevice() { return device; }
-    public void setDevice(BluetoothDevice device) { this.device = device; }
+    public WifiP2pDevice getDevice() { return device; }
+    public void setDevice(WifiP2pDevice device) { this.device = device; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -48,24 +33,24 @@ public class DeviceItem {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
-    public boolean isPaired() { return isPaired; }
-    public void setPaired(boolean paired) { isPaired = paired; }
-
-    public int getSignalStrength() { return signalStrength; }
-    public void setSignalStrength(int signalStrength) { this.signalStrength = signalStrength; }
-
     public boolean isConnecting() { return isConnecting; }
-    public void setConnecting(boolean connecting) { isConnecting = connecting; }
+    public void setConnecting(boolean connecting) { this.isConnecting = connecting; }
+
+    public int getStatus() { return status; }
+    public void setStatus(int status) { this.status = status; }
 
     /**
-     * Returns a human-readable signal strength label.
+     * Returns a human-readable status label based on WifiP2pDevice status.
      */
-    public String getSignalLabel() {
-        if (signalStrength >= -50) return "Excellent";
-        if (signalStrength >= -70) return "Strong";
-        if (signalStrength >= -80) return "Good";
-        if (signalStrength >= -90) return "Weak";
-        return "Very Weak";
+    public String getStatusLabel() {
+        switch (status) {
+            case WifiP2pDevice.CONNECTED: return "Connected";
+            case WifiP2pDevice.INVITED: return "Invited";
+            case WifiP2pDevice.FAILED: return "Failed";
+            case WifiP2pDevice.AVAILABLE: return "Available";
+            case WifiP2pDevice.UNAVAILABLE: return "Unavailable";
+            default: return "Unknown";
+        }
     }
 
     @Override
