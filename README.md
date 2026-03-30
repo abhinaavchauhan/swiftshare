@@ -17,7 +17,7 @@ SwiftShare is a premium Android application for high-speed offline file transfer
 - **🔍 Device Discovery** — Animated scanning with signal strength indicators
 - **🌙 Dark Mode** — Full dark theme support with runtime switching
 - **🔔 Notifications** — Foreground service with progress notification
-- **🔒 Permissions** — Smart runtime permission handling for all API levels
+- **🔒 Permissions** — Smart runtime permission handling for all API levels 
 
 ## 🏗️ Architecture
 
